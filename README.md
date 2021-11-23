@@ -1,6 +1,6 @@
-# mup-user
+# mup-mail
 
-Mup user micro service based on hexagonal architecture and rust language
+Mup mail micro service based on hexagonal architecture and rust language
 
 ## Development
 
