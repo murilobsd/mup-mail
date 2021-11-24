@@ -15,6 +15,12 @@ impl SendActivateAccountService {
     }
 }
 
+impl Default for SendActivateAccountService {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[async_trait]
 impl SendActivateUseCase for SendActivateAccountService {
     async fn send(&self, _email: &str) -> Result<()> {
