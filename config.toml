@@ -1,1 +1,5 @@
 amqp_addr = 'amqp://localhost:5672/%2f'
+mail_name = ''
+mail_sender = ''
+mail_domain = ''
+mail_token = ''
