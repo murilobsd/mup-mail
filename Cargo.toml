@@ -1,5 +1,6 @@
 [workspace]
 members = [
+  "adapters/provider",
   "adapters/publish",
   "mail-application",
   "mail",
