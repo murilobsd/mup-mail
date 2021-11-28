@@ -5,7 +5,6 @@ use async_trait::async_trait;
 use crate::application::port::incoming::send_activate_use_case::SendActivateUseCase;
 use crate::application::port::outgoing::send_mail_port::SendMailPort;
 
-/// The NewUserService implements the [NewUserCase]().
 #[allow(dead_code)]
 pub struct SendActivateAccountService {
     send_mail_port: Box<dyn SendMailPort + Send + Sync>,
@@ -20,7 +19,7 @@ impl SendActivateAccountService {
 
 #[async_trait]
 impl SendActivateUseCase for SendActivateAccountService {
-    async fn send(&self, _email: &str) -> Result<()> {
-        todo!()
+    async fn send(&self, email: &str) -> Result<()> {
+        self.send_mail_port.send(email).await
     }
 }

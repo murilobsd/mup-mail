@@ -4,23 +4,12 @@ use std::sync::Arc;
 
 use deadpool_lapin::Runtime;
 
+use mail_application::application::service::send_activate_service::SendActivateAccountService;
+use provider::mailgun_adapter::MailGunAdapter;
 #[allow(unused_imports)]
 use tokio_amqp::LapinTokioExt as _;
 
-use publish::user_publisher_adapter::UserPublisherAdapter;
-use provider::mailgun_adapter::MailGunAdapter;
-use mail_application::application::port::incoming::send_activate_use_case::SendActivateUseCase;
-use mail_application::application::service::new_user_service::SendActivateAccountService;
-
-struct MailState {
-    activate_acount: Arc<dyn SendActivateUseCase + Send + Sync>
-}
-
-impl MailState {
-    pub fn new( activate_acount: Arc<dyn SendActivateUseCase + Send + Sync>) -> Self {
-        Self { activate_acount }
-    }
-}
+use publish::user_publisher_adapter::{PublisherState, UserPublisherAdapter};
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -32,14 +21,16 @@ async fn main() -> std::io::Result<()> {
         ..Default::default()
     };
 
+    // service
+    let send_mail_port = MailGunAdapter::default();
+    let send_activate_service =
+        SendActivateAccountService::new(Box::new(send_mail_port));
+
+    // state
+    let publish_state = PublisherState::new(Arc::new(send_activate_service));
+
     let pool = cfg.create_pool(Some(Runtime::Tokio1)).unwrap();
-    let publisher_user = UserPublisherAdapter::new(pool);
-
-    let mailgun_adapter = MailGunAdapter::default();
-
-    let activate_acount_service = SendActivateAccountService::new(Box::new(mailgun_adapter));
-
-    let _mail_state = MailState::new(Arc::new(activate_acount_service));
+    let publisher_user = UserPublisherAdapter::new(publish_state, pool);
 
     publisher_user.run().await.unwrap();
 
